@@ -158,224 +158,224 @@
         <button onclick="restartQuiz()" class="w-full mt-4 bg-gray-500 text-white py-2 rounded">Restart Quiz</button>
     </div>
 
-    <script>
-       const questions = [
-          { q: "What is the largest organ in the human body?", options: ["Heart", "Liver", "Skin", "Brain"], answer: "Skin" },
-          { q: "How many bones are in the adult human body?", options: ["206", "210", "180", "220"], answer: "206" },
-          { q: "What is the main function of red blood cells?", options: ["Carry oxygen", "Fight infection", "Store energy", "Filter waste"], answer: "Carry oxygen" },
-          { q: "Which part of the brain controls balance and coordination?", options: ["Cerebrum", "Cerebellum", "Brainstem", "Medulla"], answer: "Cerebellum" },
-          { q: "What is the longest bone in the human body?", options: ["Humerus", "Femur", "Tibia", "Radius"], answer: "Femur" },
-          { q: "Which organ is responsible for filtering blood?", options: ["Heart", "Lungs", "Kidneys", "Liver"], answer: "Kidneys" },
-          { q: "How many chambers does the human heart have?", options: ["2", "4", "3", "5"], answer: "4" },
-          { q: "What is the basic unit of life?", options: ["Tissue", "Organ", "Cell", "Nucleus"], answer: "Cell" },
-          { q: "Which vitamin is produced when the skin is exposed to sunlight?", options: ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K"], answer: "Vitamin D" },
-          { q: "What is the function of the small intestine?", options: ["Digest food", "Absorb nutrients", "Store waste", "Filter blood"], answer: "Absorb nutrients" }
-        ];
+<script>
+    const questions = [
+        { q: "What is the largest organ in the human body?", options: ["Heart", "Liver", "Skin", "Brain"], answer: "Skin", correct: 2 },
+        { q: "How many bones are in the adult human body?", options: ["206", "210", "180", "220"], answer: "206", correct: 0 },
+        { q: "What is the main function of red blood cells?", options: ["Carry oxygen", "Fight infection", "Store energy", "Filter waste"], answer: "Carry oxygen", correct: 0 },
+        { q: "Which part of the brain controls balance and coordination?", options: ["Cerebrum", "Cerebellum", "Brainstem", "Medulla"], answer: "Cerebellum", correct: 1 },
+        { q: "What is the longest bone in the human body?", options: ["Humerus", "Femur", "Tibia", "Radius"], answer: "Femur", correct: 1 },
+        { q: "Which organ is responsible for filtering blood?", options: ["Heart", "Lungs", "Kidneys", "Liver"], answer: "Kidneys", correct: 2 },
+        { q: "How many chambers does the human heart have?", options: ["2", "4", "3", "5"], answer: "4", correct: 1 },
+        { q: "What is the basic unit of life?", options: ["Tissue", "Organ", "Cell", "Nucleus"], answer: "Cell", correct: 2 },
+        { q: "Which vitamin is produced when the skin is exposed to sunlight?", options: ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K"], answer: "Vitamin D", correct: 2 },
+        { q: "What is the function of the small intestine?", options: ["Digest food", "Absorb nutrients", "Store waste", "Filter blood"], answer: "Absorb nutrients", correct: 1 }
+    ];
 
-        let currentQuestion = 0;
-        let userAnswers = [];
-        let rollNumber = "";
-        let userName = "";
-        let timerInterval;
-        let timeLeft = 600;
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let rollNumber = "";
+    let userName = "";
+    let timerInterval;
+    let timeLeft = 600;
 
-        function startQuiz() {
-            rollNumber = document.getElementById('rollNumber').value;
-            userName = document.getElementById('userName').value;
+    function startQuiz() {
+        rollNumber = document.getElementById('rollNumber').value;
+        userName = document.getElementById('userName').value;
 
-            if (!rollNumber || !userName) {
-                alert('Please enter both Roll Number and Name');
-                return;
-            }
-
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('quizContainer').classList.remove('hidden');
-            startTimer();
-            loadQuestion();
+        if (!rollNumber || !userName) {
+            alert('Please enter both Roll Number and Name');
+            return;
         }
 
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        document.getElementById('loginContainer').classList.add('hidden');
+        document.getElementById('quizContainer').classList.remove('hidden');
+        startTimer();
+        loadQuestion();
+    }
 
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert('Time is up!');
-                    showResults();
-                }
-            }, 1000);
-        }
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-        function loadQuestion() {
-            const questionData = questions[currentQuestion];
-            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
-            document.getElementById('question').textContent = questionData.question;
-            const optionsDiv = document.getElementById('options');
-            optionsDiv.innerHTML = '';
-
-            questionData.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.className = 'question-option';
-                if (userAnswers[currentQuestion] === index) {
-                    button.classList.add('selected');
-                }
-                button.onclick = () => {
-                    userAnswers[currentQuestion] = index;
-                    loadQuestion();
-                };
-                optionsDiv.appendChild(button);
-            });
-        }
-
-        function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                loadQuestion();
-            }
-        }
-
-        function prevQuestion() {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                loadQuestion();
-            }
-        }
-
-        function submitQuiz() {
-            if (confirm("Are you sure you want to submit the quiz?")) {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert('Time is up!');
                 showResults();
             }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        const questionData = questions[currentQuestion];
+        document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+        document.getElementById('question').textContent = questionData.q;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+
+        questionData.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.className = 'question-option';
+            if (userAnswers[currentQuestion] === index) {
+                button.classList.add('selected');
+            }
+            button.onclick = () => {
+                userAnswers[currentQuestion] = index;
+                loadQuestion();
+            };
+            optionsDiv.appendChild(button);
+        });
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            loadQuestion();
         }
+    }
 
-        function showResults() {
-            clearInterval(timerInterval);
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            loadQuestion();
+        }
+    }
 
-            const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
-            const incorrect = questions.length - correct;
-            const totalTimeSpent = 600 - timeLeft;
+    function submitQuiz() {
+        if (confirm("Are you sure you want to submit the quiz?")) {
+            showResults();
+        }
+    }
 
-            document.getElementById('quizContainer').classList.add('hidden');
-            document.getElementById('resultContainer').classList.remove('hidden');
+    function showResults() {
+        clearInterval(timerInterval);
 
-            document.getElementById('resultInfo').textContent = `Name: ${userName}, Roll Number: ${rollNumber}`;
-            document.getElementById('totalMarks').textContent = `Score: ${correct} / ${questions.length}`;
+        const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
+        const incorrect = questions.length - correct;
+        const totalTimeSpent = 600 - timeLeft;
 
-            const ctx = document.getElementById('resultChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Correct', 'Incorrect'],
-                    datasets: [{
-                        label: 'Results',
-                        data: [correct, incorrect],
-                        backgroundColor: ['#ff6347', '#1e3a8a'], // Red and Blue
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        document.getElementById('quizContainer').classList.add('hidden');
+        document.getElementById('resultContainer').classList.remove('hidden');
+
+        document.getElementById('resultInfo').textContent = `Name: ${userName}, Roll Number: ${rollNumber}`;
+        document.getElementById('totalMarks').textContent = `Score: ${correct} / ${questions.length}`;
+
+        const ctx = document.getElementById('resultChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    label: 'Results',
+                    data: [correct, incorrect],
+                    backgroundColor: ['#ff6347', '#1e3a8a'], // Red and Blue
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
+            }
+        });
 
-            const incorrectQuestionsDiv = document.getElementById('incorrectQuestions');
-            incorrectQuestionsDiv.innerHTML = '<h3 class="text-lg font-bold text-white">Incorrect Answers:</h3>';
-            questions.forEach((question, index) => {
-                if (userAnswers[index] !== question.correct) {
-                    const incorrectText = document.createElement('p');
-                    incorrectText.className = 'incorrect-text';
-                    incorrectText.textContent = `${question.question} - Correct Answer: ${question.options[question.correct]}`;
-                    incorrectQuestionsDiv.appendChild(incorrectText);
-                }
-            });
-        }
+        const incorrectQuestionsDiv = document.getElementById('incorrectQuestions');
+        incorrectQuestionsDiv.innerHTML = '<h3 class="text-lg font-bold text-white">Incorrect Answers:</h3>';
+        questions.forEach((question, index) => {
+            if (userAnswers[index] !== question.correct) {
+                const incorrectText = document.createElement('p');
+                incorrectText.className = 'incorrect-text';
+                incorrectText.textContent = `${question.q} - Correct Answer: ${question.options[question.correct]}`;
+                incorrectQuestionsDiv.appendChild(incorrectText);
+            }
+        });
+    }
 
-        function restartQuiz() {
-            currentQuestion = 0;
-            userAnswers = [];
-            timeLeft = 600;
-            clearInterval(timerInterval);
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('loginContainer').classList.remove('hidden');
-        }
+    function restartQuiz() {
+        currentQuestion = 0;
+        userAnswers = [];
+        timeLeft = 600;
+        clearInterval(timerInterval);
+        document.getElementById('resultContainer').classList.add('hidden');
+        document.getElementById('loginContainer').classList.remove('hidden');
+    }
 
-        function downloadResultPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const examDate = new Date().toLocaleDateString();
-    const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
-    const incorrect = questions.length - correct;
-    const totalTimeSpent = 600 - timeLeft;
+    function downloadResultPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const examDate = new Date().toLocaleDateString();
+        const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
+        const incorrect = questions.length - correct;
+        const totalTimeSpent = 600 - timeLeft;
 
-    // Set background color for the header
-    doc.setFillColor(30, 58, 138); // Blue color
-    doc.rect(0, 0, 210, 30, 'F'); // Fill the header area
+        // Set background color for the header
+        doc.setFillColor(30, 58, 138); // Blue color
+        doc.rect(0, 0, 210, 30, 'F'); // Fill the header area
 
-    // Add header text
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255); // White text
-    doc.text("PMI EDUVERSE EXAM RESULT", 105, 20, { align: 'center' });
+        // Add header text
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255); // White text
+        doc.text("PMI EDUVERSE EXAM RESULT", 105, 20, { align: 'center' });
 
-    // Add the branding logo on the top left
-    const logoUrl = 'https://i.ibb.co/PzmBMLmY/SJHY6436.png';  // Logo URL
-    doc.addImage(logoUrl, 'PNG', 10, 5, 30, 30); // Positioning logo at top left
+        // Add the branding logo on the top left
+        const logoUrl = 'https://i.ibb.co/PzmBMLmY/SJHY6436.png';  // Logo URL
+        doc.addImage(logoUrl, 'PNG', 10, 5, 30, 30); // Positioning logo at top left
 
-    // Create a border around the page (no margins)
-    const pageWidth = 210; // Page width (A4)
-    const pageHeight = 297; // Page height (A4)
-    const borderThickness = 2; // Thickness of the border
+        // Create a border around the page (no margins)
+        const pageWidth = 210; // Page width (A4)
+        const pageHeight = 297; // Page height (A4)
+        const borderThickness = 2; // Thickness of the border
 
-    // Draw the border
-    doc.setLineWidth(borderThickness);
-    doc.setDrawColor(0, 0, 0); // Black color for the border
-    doc.rect(0, 0, pageWidth, pageHeight); // Create a rectangle around the page, no margin
+        // Draw the border
+        doc.setLineWidth(borderThickness);
+        doc.setDrawColor(0, 0, 0); // Black color for the border
+        doc.rect(0, 0, pageWidth, pageHeight); // Create a rectangle around the page, no margin
 
-    // Reset text color and font for the body
-    doc.setTextColor(0, 0, 0); // Black text
-    doc.setFontSize(16);
+        // Reset text color and font for the body
+        doc.setTextColor(0, 0, 0); // Black text
+        doc.setFontSize(16);
 
-    // Add user details
-    doc.setFont("helvetica", "bold");
-    doc.text("Candidate Details:", 20, 50);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${userName}`, 20, 60);
-    doc.text(`Roll Number: ${rollNumber}`, 20, 70);
+        // Add user details
+        doc.setFont("helvetica", "bold");
+        doc.text("Candidate Details:", 20, 50);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Name: ${userName}`, 20, 60);
+        doc.text(`Roll Number: ${rollNumber}`, 20, 70);
 
-    // Add exam details
-    doc.setFont("helvetica", "bold");
-    doc.text("Exam Details:", 20, 90);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Marks: ${correct} / ${questions.length}`, 20, 100);
-    doc.text(`Total Time Spent: ${Math.floor(totalTimeSpent / 60)} min ${totalTimeSpent % 60} sec`, 20, 110);
-    doc.text(`Total Incorrect Answers: ${incorrect}`, 20, 120);
-    doc.text(`Test Topic: Anatomy Study of human body structure and organization.`, 20, 130);
-    doc.text(`Date of Exam: ${examDate}`, 20, 140);
+        // Add exam details
+        doc.setFont("helvetica", "bold");
+        doc.text("Exam Details:", 20, 90);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Marks: ${correct} / ${questions.length}`, 20, 100);
+        doc.text(`Total Time Spent: ${Math.floor(totalTimeSpent / 60)} min ${totalTimeSpent % 60} sec`, 20, 110);
+        doc.text(`Total Incorrect Answers: ${incorrect}`, 20, 120);
+        doc.text(`Test Topic: Anatomy Study of human body structure and organization.`, 20, 130);
+        doc.text(`Date of Exam: ${examDate}`, 20, 140);
 
-    // Add a colored box for the examiner's note
-    doc.setFillColor(255, 215, 0); // Gold color
-    doc.rect(20, 150, 170, 30, 'F'); // Fill the box area
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0); // Black text
-    doc.text("Examiner's Note:", 25, 160);
-    doc.setFont("helvetica", "normal");
-    doc.text("Focus on conceptual clarity and practice regularly!", 25, 170);
+        // Add a colored box for the examiner's note
+        doc.setFillColor(255, 215, 0); // Gold color
+        doc.rect(20, 150, 170, 30, 'F'); // Fill the box area
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0); // Black text
+        doc.text("Examiner's Note:", 25, 160);
+        doc.setFont("helvetica", "normal");
+        doc.text("Focus on conceptual clarity and practice regularly!", 25, 170);
 
-    // Add footer
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(30, 58, 138); // Blue text
-    doc.text("PMI EDUVERSE", 105, 280, { align: 'center' });
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0); // Black text
-    doc.text("Thank You for participating!", 105, 290, { align: 'center' });
+        // Add footer
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(30, 58, 138); // Blue text
+        doc.text("PMI EDUVERSE", 105, 280, { align: 'center' });
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0); // Black text
+        doc.text("Thank You for participating!", 105, 290, { align: 'center' });
 
-    // Save the PDF
+        // Save the PDF
     doc.save("Quiz_Result.pdf");
 }
 
