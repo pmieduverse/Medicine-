@@ -6,7 +6,7 @@
     <title>PMI Eduverse Examination</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -123,9 +123,11 @@
             <p class="text-sm text-gray-300">Prepare yourself to complete all questions before submitting!</p>
         </div>
 
-        <input id="rollNumber" type="text" placeholder="Enter Roll Number" class="w-full p-3 mb-4 rounded text-black">
-        <input id="userName" type="text" placeholder="Enter Your Name" class="w-full p-3 mb-4 rounded text-black">
-        <button onclick="startQuiz()" class="w-full mt-4">Start Quiz</button>
+        <form id="loginForm" onsubmit="startQuiz(); return false;">
+            <input id="rollNumber" type="text" placeholder="Enter Roll Number" class="w-full p-3 mb-4 rounded text-black" required>
+            <input id="userName" type="text" placeholder="Enter Your Name" class="w-full p-3 mb-4 rounded text-black" required>
+            <button type="submit" class="w-full mt-4">Start Quiz</button>
+        </form>
     </div>
 
     <!-- Quiz Section -->
@@ -138,9 +140,9 @@
             <div id="options" class="grid gap-4"></div>
         </div>
         <div class="flex justify-between mt-6">
-            <button onclick="prevQuestion()" class="bg-gray-400">Previous</button>
-            <button onclick="nextQuestion()">Next</button>
-            <button onclick="submitQuiz()" class="bg-red-500">Submit Quiz</button>
+            <button type="button" onclick="prevQuestion()" class="bg-gray-400">Previous</button>
+            <button type="button" onclick="nextQuestion()">Next</button>
+            <button type="button" onclick="submitQuiz()" class="bg-red-500">Submit Quiz</button>
         </div>
     </div>
 
@@ -153,9 +155,9 @@
         <div id="incorrectQuestions" class="mt-6"></div>
         
         <!-- Download PDF Button -->
-        <button onclick="downloadResultPDF()" class="w-full mt-4 bg-blue-500 text-white py-2 rounded">Download PDF</button>
+        <button type="button" onclick="downloadResultPDF()" class="w-full mt-4 bg-blue-500 text-white py-2 rounded">Download PDF</button>
         
-        <button onclick="restartQuiz()" class="w-full mt-4 bg-gray-500 text-white py-2 rounded">Restart Quiz</button>
+        <button type="button" onclick="restartQuiz()" class="w-full mt-4 bg-gray-500 text-white py-2 rounded">Restart Quiz</button>
     </div>
 
 <script>
@@ -178,6 +180,22 @@
     let userName = "";
     let timerInterval;
     let timeLeft = 600;
+
+    window.onload = function() {
+        // Initialize Chart.js
+        if (typeof Chart === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            document.head.appendChild(script);
+        }
+
+        // Initialize jsPDF
+        if (typeof window.jspdf === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            document.head.appendChild(script);
+        }
+    }
 
     function startQuiz() {
         rollNumber = document.getElementById('rollNumber').value;
@@ -218,6 +236,7 @@
 
         questionData.options.forEach((option, index) => {
             const button = document.createElement('button');
+            button.type = 'button';
             button.textContent = option;
             button.className = 'question-option';
             if (userAnswers[currentQuestion] === index) {
@@ -252,48 +271,56 @@
     }
 
     function showResults() {
-        clearInterval(timerInterval);
+        try {
+            clearInterval(timerInterval);
 
-        const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
-        const incorrect = questions.length - correct;
-        const totalTimeSpent = 600 - timeLeft;
+            const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
+            const incorrect = questions.length - correct;
+            const totalTimeSpent = 600 - timeLeft;
 
-        document.getElementById('quizContainer').classList.add('hidden');
-        document.getElementById('resultContainer').classList.remove('hidden');
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('resultContainer').classList.remove('hidden');
 
-        document.getElementById('resultInfo').textContent = `Name: ${userName}, Roll Number: ${rollNumber}`;
-        document.getElementById('totalMarks').textContent = `Score: ${correct} / ${questions.length}`;
+            document.getElementById('resultInfo').textContent = `Name: ${userName}, Roll Number: ${rollNumber}`;
+            document.getElementById('totalMarks').textContent = `Score: ${correct} / ${questions.length}`;
 
-        const ctx = document.getElementById('resultChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Correct', 'Incorrect'],
-                datasets: [{
-                    label: 'Results',
-                    data: [correct, incorrect],
-                    backgroundColor: ['#ff6347', '#1e3a8a'], // Red and Blue
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+            // Make sure Chart is loaded before using it
+            if (typeof Chart !== 'undefined') {
+                const ctx = document.getElementById('resultChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Correct', 'Incorrect'],
+                        datasets: [{
+                            label: 'Results',
+                            data: [correct, incorrect],
+                            backgroundColor: ['#ff6347', '#1e3a8a'],
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
 
-        const incorrectQuestionsDiv = document.getElementById('incorrectQuestions');
-        incorrectQuestionsDiv.innerHTML = '<h3 class="text-lg font-bold text-white">Incorrect Answers:</h3>';
-        questions.forEach((question, index) => {
-            if (userAnswers[index] !== question.correct) {
-                const incorrectText = document.createElement('p');
-                incorrectText.className = 'incorrect-text';
-                incorrectText.textContent = `${question.q} - Correct Answer: ${question.options[question.correct]}`;
-                incorrectQuestionsDiv.appendChild(incorrectText);
-            }
-        });
+            const incorrectQuestionsDiv = document.getElementById('incorrectQuestions');
+            incorrectQuestionsDiv.innerHTML = '<h3 class="text-lg font-bold text-white">Incorrect Answers:</h3>';
+            questions.forEach((question, index) => {
+                if (userAnswers[index] !== question.correct) {
+                    const incorrectText = document.createElement('p');
+                    incorrectText.className = 'incorrect-text';
+                    incorrectText.textContent = `${question.q} - Correct Answer: ${question.options[question.correct]}`;
+                    incorrectQuestionsDiv.appendChild(incorrectText);
+                }
+            });
+        } catch (error) {
+            console.error('Error showing results:', error);
+            alert('There was an error showing the results. Please try again.');
+        }
     }
 
     function restartQuiz() {
@@ -303,97 +330,96 @@
         clearInterval(timerInterval);
         document.getElementById('resultContainer').classList.add('hidden');
         document.getElementById('loginContainer').classList.remove('hidden');
+        document.getElementById('rollNumber').value = '';
+        document.getElementById('userName').value = '';
     }
 
     function downloadResultPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const examDate = new Date().toLocaleDateString();
-        const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
-        const incorrect = questions.length - correct;
-        const totalTimeSpent = 600 - timeLeft;
-
-        // Set background color for the header
-        doc.setFillColor(30, 58, 138); // Blue color
-        doc.rect(0, 0, 210, 30, 'F'); // Fill the header area
-
-        // Add header text
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(255, 255, 255); // White text
-        doc.text("PMI EDUVERSE EXAM RESULT", 105, 20, { align: 'center' });
-
-        // Add the branding logo on the top left
-        const logoUrl = 'https://i.ibb.co/PzmBMLmY/SJHY6436.png';  // Logo URL
-        doc.addImage(logoUrl, 'PNG', 10, 5, 30, 30); // Positioning logo at top left
-
-        // Create a border around the page (no margins)
-        const pageWidth = 210; // Page width (A4)
-        const pageHeight = 297; // Page height (A4)
-        const borderThickness = 2; // Thickness of the border
-
-        // Draw the border
-        doc.setLineWidth(borderThickness);
-        doc.setDrawColor(0, 0, 0); // Black color for the border
-        doc.rect(0, 0, pageWidth, pageHeight); // Create a rectangle around the page, no margin
-
-        // Reset text color and font for the body
-        doc.setTextColor(0, 0, 0); // Black text
-        doc.setFontSize(16);
-
-        // Add user details
-        doc.setFont("helvetica", "bold");
-        doc.text("Candidate Details:", 20, 50);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Name: ${userName}`, 20, 60);
-        doc.text(`Roll Number: ${rollNumber}`, 20, 70);
-
-        // Add exam details
-        doc.setFont("helvetica", "bold");
-        doc.text("Exam Details:", 20, 90);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Marks: ${correct} / ${questions.length}`, 20, 100);
-        doc.text(`Total Time Spent: ${Math.floor(totalTimeSpent / 60)} min ${totalTimeSpent % 60} sec`, 20, 110);
-        doc.text(`Total Incorrect Answers: ${incorrect}`, 20, 120);
-        doc.text(`Test Topic: Anatomy Study of human body structure and organization.`, 20, 130);
-        doc.text(`Date of Exam: ${examDate}`, 20, 140);
-
-        // Add a colored box for the examiner's note
-        doc.setFillColor(255, 215, 0); // Gold color
-        doc.rect(20, 150, 170, 30, 'F'); // Fill the box area
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(0, 0, 0); // Black text
-        doc.text("Examiner's Note:", 25, 160);
-        doc.setFont("helvetica", "normal");
-        doc.text("Focus on conceptual clarity and practice regularly!", 25, 170);
-
-        // Add footer
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(30, 58, 138); // Blue text
-        doc.text("PMI EDUVERSE", 105, 280, { align: 'center' });
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(0, 0, 0); // Black text
-        doc.text("Thank You for participating!", 105, 290, { align: 'center' });
-
-        // Save the PDF
-    doc.save("Quiz_Result.pdf");
-}
-
-        // Disable Right Click
-        document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // Disable Ctrl+U (View Source) and DevTools Shortcuts
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && (event.key === 'u' || event.key === 'U')) {
-                event.preventDefault();
+        try {
+            if (typeof window.jspdf === 'undefined') {
+                alert('PDF generation is loading. Please wait a moment and try again.');
+                return;
             }
-            if (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) {
-                event.preventDefault();
-            }
-            if (event.ctrlKey && (event.key === 'c' || event.key === 'C')) {
-                event.preventDefault();
-            }
-        });
-    </script>
-</body>
-</html>
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const examDate = new Date().toLocaleDateString();
+            const correct = userAnswers.filter((answer, index) => answer === questions[index].correct).length;
+            const incorrect = questions.length - correct;
+            const totalTimeSpent = 600 - timeLeft;
+
+            doc.setFillColor(30, 58, 138);
+            doc.rect(0, 0, 210, 30, 'F');
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text("PMI EDUVERSE EXAM RESULT", 105, 20, { align: 'center' });
+
+            const logoUrl = 'https://i.ibb.co/PzmBMLmY/SJHY6436.png';
+            doc.addImage(logoUrl, 'PNG', 10, 5, 30, 30);
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const borderThickness = 2;
+
+            doc.setLineWidth(borderThickness);
+            doc.setDrawColor(0, 0, 0);
+            doc.rect(0, 0, pageWidth, pageHeight);
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Candidate Details:", 20, 50);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Name: ${userName}`, 20, 60);
+            doc.text(`Roll Number: ${rollNumber}`, 20, 70);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Exam Details:", 20, 90);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Marks: ${correct} / ${questions.length}`, 20, 100);
+            doc.text(`Total Time Spent: ${Math.floor(totalTimeSpent / 60)} min ${totalTimeSpent % 60} sec`, 20, 110);
+            doc.text(`Total Incorrect Answers: ${incorrect}`, 20, 120);
+            doc.text(`Test Topic: Anatomy Study of human body structure and organization.`, 20, 130);
+            doc.text(`Date of Exam: ${examDate}`, 20, 140);
+
+            doc.setFillColor(255, 215, 0);
+            doc.rect(20, 150, 170, 30, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 0, 0);
+            doc.text("Examiner's Note:", 25, 160);
+            doc.setFont("helvetica", "normal");
+            doc.text("Focus on conceptual clarity and practice regularly!", 25, 170);
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(30, 58, 138);
+            doc.text("PMI EDUVERSE", 105, 280, { align: 'center' });
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text("Thank You for participating!", 105, 290, { align: 'center' });
+
+            doc.save("Quiz_Result.pdf");
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('There was an error generating the PDF. Please try again.');
+        }
+    }
+
+    // Disable Right Click
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable Ctrl+U (View Source) and DevTools Shortcuts
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && (event.key === 'u' || event.key === 'U')) {
+            event.preventDefault();
+        }
+        if (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) {
+            event.preventDefault();
+        }
+        if (event.ctrlKey && (event.key === 'c' || event.key === 'C')) {
+            event.preventDefault();
+        }
+    });
+</script>
